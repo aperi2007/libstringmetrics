@@ -76,6 +76,8 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
             sprintf(str,"\n");
           	mex = realloc(mex,strlen(mex)+strlen(str)+1);
            	strcat(mex,str);
+			sqlite3_result_text(context, mex, strlen(mex)+1, NULL);
+
 	} else {
         float similarity = 0;
 		char *par0 = strdup(sqlite3_value_text(argv[0]));

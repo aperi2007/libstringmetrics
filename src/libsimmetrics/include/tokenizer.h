@@ -24,12 +24,15 @@
  *
  *  Created on: 05 Dec 2012
  *      Author: Johnathan Botha <jokillsya@gmail.com>
+ *
+ *	Modify on : 22 Sep 2014
+ *  	enhanced the WHITESPACE_DELIMITERS
  */
 
 #ifndef TOKENIZER_H_
 #define TOKENIZER_H_
 
-#define WHITESPACE_DELIMITERS "\r\n\t \u00A0"
+#define WHITESPACE_DELIMITERS "*\\`&+.,;:-_/'\"()\r\n\t \u00A0"
 
 #define QGRAM_SP "#"
 #define QGRAM_EP "#"
