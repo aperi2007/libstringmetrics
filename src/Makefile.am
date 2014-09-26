@@ -1,5 +1,9 @@
+AM_CPPFLAGS = @CFLAGS@
+AM_CPPFLAGS = -I$(top_srcdir)/src/libsqlite/include \
+AM_CPPFLAGS += -I$(top_srcdir)/src/libsimmetrics/include 
+	
 lib_LTLIBRARIES = libstringmetrics.la
-libstringmetrics_LIBADD = '-static'
+
 libstringmetrics_la_SOURCES = stringmetrics.c \
 			wrapper_functions.c \
 			libsimmetrics/simmetrics/util.c \
@@ -25,9 +29,13 @@ libstringmetrics_la_SOURCES = stringmetrics.c \
 			libsimmetrics/simmetrics/overlap_coefficient.c \
 			libsimmetrics/simmetrics/qgrams_distance.c
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/libsqlite/include \
-	-I$(top_srcdir)/src/libsimmetrics/include 
-	
+
+libspatialite_la_LIBADD = ./libstringmetrics.la
+
+if MINGW
+libstringmetrics_la_LDFLAGS = -version-info 0:1:1 -no-undefined
+endif
+
 # to avoid boring messages for not gnu files organization
 AUTOMAKE_OPTIONS = foreign
 

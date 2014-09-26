@@ -1,7 +1,23 @@
-gcc -std=c99 -w -g -shared \
-	-I src \
+# gcc -std=c99 -w -g -mwindows -static-libgcc -no-undefined \
+
+gcc 	-std=c99 \
+	-w \
+	-s \
+	-O3 \
+	-mwin32 \
+	-pipe \
+	-march=i686 \
+	-mtune=i686 \
+	-shared \
+    	-Wl,-Bstatic \
+    	-Wl,--output-def,libstringmetrics.def,--out-implib,libstringmetrics.a \
+    	-mthreads \
+    	-static-libgcc \
+    	-static \
+    	-I src \
 	-I src/libsimmetrics/include \
 	-I src/libsqlite/include \
+	-o libstringmetrics.dll \
 	src/stringmetrics.c \
 	src/wrapper_functions.c \
 	src/libsimmetrics/simmetrics/block_distance.c \
@@ -26,7 +42,6 @@ gcc -std=c99 -w -g -shared \
 	src/libsimmetrics/simmetrics/soundex.c \
 	src/libsimmetrics/simmetrics/tokenizer.c \
 	src/libsimmetrics/simmetrics/util.c \
-	src/libsqlite/sqlite/sqlite3.c \
-	-o libstringmetrics.dll
+	src/libsqlite/sqlite/sqlite3.c
 
 	

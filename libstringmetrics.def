@@ -1,0 +1,2 @@
+EXPORTS
+    sqlite3_stringmetrics_init @1
