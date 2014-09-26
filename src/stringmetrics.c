@@ -33,3 +33,4 @@ __declspec(dllexport) int __cdecl sqlite3_stringmetrics_init(
   sqlite3_create_function(db, "stringmetrics", -1, SQLITE_ANY, 0, stringmetricsFunc, 0, 0);
   return rc;
 }
+

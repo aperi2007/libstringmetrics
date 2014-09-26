@@ -1,12 +1,27 @@
+# gcc -std=c99 -w -g -mwindows -static-libgcc -no-undefined \
+#	-mwin32 \
+#    	-Wl,-Bstatic \
+#    	-nostdlib \
+#    	-nodefaultlibs \
+#    	-static \
+#	-s \
+#	-m32 \
+#	-I C:/my-programs/MinGW/lib \
+#	-I C:/my-programs/MinGW/lib/gcc/mingw32/4.8.1 \
+#	-lmingw32 \
+#	-lgcc \
+#	-lstdc++ \
+#    	-mthreads \
+#	-march=i686 \
+#	-mtune=i686 \
+#    	-Wl,--subsystem,windows,--output-def,libstringmetrics.def,--out-implib,libstringmetrics.a \
 
 gcc 	-std=c99 \
 	-w \
-	-g \
 	-O0 \
-    	-I src \
-	-shared \
+    	-static-libstdc++ \
     	-static-libgcc \
-	-static-libstdc++ \
+    	-I src \
 	-I src/libsimmetrics/include \
 	-I src/libsqlite/include \
 	-o libstringmetrics.dll \
