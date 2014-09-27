@@ -32,7 +32,8 @@
 #ifndef TOKENIZER_H_
 #define TOKENIZER_H_
 
-#define WHITESPACE_DELIMITERS "*\\`&+.,;:-_/'\"()\r\n\t \u00A0"
+#define WHITESPACE_DELIMITERS "\r\n\t \u00A0"
+/* #define WHITESPACE_DELIMITERS "*\\`&+.,;:-_/'\"()\r\n\t \u00A0" */
 
 #define QGRAM_SP "#"
 #define QGRAM_EP "#"
