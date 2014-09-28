@@ -69,7 +69,7 @@
 								"dice",
 								"dice_custom",
 								"euclidean_distance",
-								"euclidean_custom",
+								"euclidean_distance_custom",
 								"jaccard",
 								"jaccard_custom",
 								"jaro",
@@ -83,7 +83,7 @@
 								"overlap_coefficient",
 								"overlap_coefficient_custom",
 								"qgrams_distance",
-								"qgrams_custom",
+								"qgrams_distance_custom",
 								"smith_waterman",
 								"smith_waterman_gotoh",
 								"soundex_phonetics",
@@ -180,9 +180,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 sprintf(metrics, "%f", similarity);
                 break;
             case 5:
-                sm_name = "Dice Similarity customized";
-                similarity = dice_similarity(par1, par2);
-                sprintf(metrics, "%f", similarity);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Dice Similarity customized";
+	                similarity = dice_similarity_custom(par1, par2, &tokenizer );
+					sprintf(metrics, "%f", similarity);
+				}
                 break;
             case 6:
                 sm_name = "Euclidean Distance";
@@ -190,9 +197,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 similarity = euclidean_distance_similarity(par1, par2);
                 break;
             case 7:
-                sm_name = "Euclidean Distance customized";
-                sprintf(metrics, "%3.2f", euclidean_distance(par1, par2));
-                similarity = euclidean_distance_similarity(par1, par2);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Euclidean Distance customized";
+	                similarity = euclidean_distance_similarity_custom(par1, par2, &tokenizer);;
+					sprintf(metrics, "%d", euclidean_distance_custom(par1, par2, &tokenizer ));
+				}
                 break;
             case 8:
                 sm_name = "Jaccard Similarity";
@@ -200,9 +214,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 sprintf(metrics, "%f", similarity);
                 break;
             case 9:
-                sm_name = "Jaccard Similarity customized";
-                similarity = jaccard_similarity(par1, par2);
-                sprintf(metrics, "%f", similarity);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Jaccard Similarity customized";
+	                similarity = jaccard_similarity_custom(par1, par2, &tokenizer);;
+					sprintf(metrics, "%f", similarity);
+				}
                 break;
             case 10:
                 sm_name = "Jaro Similarity";
@@ -225,9 +246,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 similarity = matching_coefficient_similarity(par1, par2);
                 break;
             case 14:
-                sm_name = "Matching Coefficient SimMetrics customized";
-                sprintf(metrics, "%3.2f", matching_coefficient(par1, par2));
-                similarity = matching_coefficient_similarity(par1, par2);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Matching Coefficient SimMetrics customized";
+	                similarity = matching_coefficient_similarity_custom(par1, par2, &tokenizer);
+					sprintf(metrics, "%3.2f", matching_coefficient_custom(par1, par2, &tokenizer));
+				}
                 break;
             case 15:
                 sm_name = "Monge Elkan Similarity";
@@ -235,9 +263,11 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 sprintf(metrics, "%f", similarity);
                 break;
             case 16:
-                sm_name = "Monge Elkan Similarity customized";
-                similarity = monge_elkan_similarity(par1, par2);
-                sprintf(metrics, "%f", similarity);
+                {
+	                sm_name = "Matching Coefficient SimMetrics customized STILL NOT IMPLEMENTED";
+	                similarity = 0;
+					sprintf(metrics, "still not implemented");
+				}
                 break;
             case 17:
                 sm_name = "Needleman Wunch SimMetrics";
@@ -250,9 +280,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 sprintf(metrics, "%f", similarity);
                 break;
             case 19:
-                sm_name = "Overlap Coefficient Similarity customized";
-                similarity = overlap_coefficient_similarity(par1, par2);
-                sprintf(metrics, "%f", similarity);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Overlap Coefficient Similarity customized";
+	                similarity = overlap_coefficient_similarity_custom(par1, par2, &tokenizer);
+					sprintf(metrics, "%f", similarity);
+				}
                 break;
             case 20:
                 sm_name = "QGrams Distance";
@@ -260,9 +297,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 similarity = qgrams_distance_similarity(par1, par2);
                 break;
             case 21:
-                sm_name = "QGrams Distance customized";
-                sprintf(metrics, "%d", qgrams_distance(par1, par2));
-                similarity = qgrams_distance_similarity(par1, par2);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "QGrams Distance customized";
+	                similarity = qgrams_distance_similarity_custom(par1, par2, &tokenizer);
+					sprintf(metrics, "%d", qgrams_distance_custom(par1, par2,&tokenizer));
+				}
                 break;
             case 22:
                 sm_name = "Smith Waterman SimMetrics";

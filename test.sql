@@ -1,0 +1,26 @@
+select load_extension("libstringmetrics.dll");
+select stringmetrics("block_distance_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("cosine_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("dice_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("euclidean_distance","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("euclidean_distance_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("jaccard","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("jaccard_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("jaro","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("jaro_winkler","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("levenshtein","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("matching_coefficient","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("matching_coefficient_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("monge_elkan","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("monge_elkan_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("needleman_wunch","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("overlap_coefficient","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("overlap_coefficient_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("qgrams_distance","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("qgrams_distance_custom","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("smith_waterman","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("smith_waterman_gotoh","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("soundex_phonetics","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("metaphone_phonetics","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+select stringmetrics("double_metaphone_phonetics","phrase","via giuseppe-garibaldi,25", "via giuseppe garibaldi 25",",-");
+
