@@ -103,7 +103,7 @@ SQLITE_EXTENSION_INIT3
 	    return (-1);
 	}
 
-int stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
+void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
 	int result;
 	char *sm_name=NULL, *mex=NULL, str[80], metrics[250], tokenlist=NULL;
@@ -127,7 +127,7 @@ int stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
             sprintf(str,"\n");
           	mex = realloc(mex,strlen(mex)+strlen(str)+1);
            	strcat(mex,str);
-			sqlite3_result_text(context, mex, strlen(mex)+1, NULL);
+			sqlite3_result_text(context, mex, strlen(mex)+1, free);
 
 	} else {
         float similarity = 0;
@@ -349,24 +349,25 @@ int stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 break;
             default:
                sprintf(metrics,"Unknown SimMetric %s, not found.\n", par0);
-               return (SQLITE_ERROR);
+               sqlite3_result_error(context, metrics, -1);
+               return;
 		}
 		if(kindofoutput!=NULL) {
 			if(stricmp(kindofoutput,"similarity")==0) {
 				sqlite3_result_double(context, similarity);
 			} else if(stricmp(kindofoutput,"metric")==0) {
-				sqlite3_result_text(context, metrics, strlen(metrics)+1, NULL);
+				sqlite3_result_text(context, metrics, strlen(metrics)+1, SQLITE_TRANSIENT);
 			} else {
 				mex = malloc(strlen(sm_name) + 200 + strlen(metrics)+1);
 				sprintf(mex,"%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
-				sqlite3_result_text(context, mex, strlen(mex)+1, NULL);
+				sqlite3_result_text(context, mex, strlen(mex)+1, free);
 			}
 		} else {
 			mex = malloc(strlen(sm_name) + 200 + strlen(metrics)+1);
 			sprintf(mex,"%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
-			sqlite3_result_text(context, mex, strlen(mex)+1, NULL);
+			sqlite3_result_text(context, mex, strlen(mex)+1, free);
 		}
     }
 
-	return (SQLITE_OK);
+	return;
 }
