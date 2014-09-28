@@ -33,17 +33,6 @@
 
 SQLITE_EXTENSION_INIT1
 
-/* Insert your extension code here */
-
-//#ifdef _WIN32
-//__declspec(dllexport)
-//#endif
-/* TODO: Change the entry point name so that "extension" is replaced by
-** text derived from the shared library filename as follows:  Copy every
-** ASCII alphabetic character from the filename after the last "/" through
-** the next following ".", converting each character to lowercase, and
-** discarding the first three characters if they are "lib".
-*/
 __declspec(dllexport) int __cdecl sqlite3_stringmetrics_init(
   sqlite3 *db,
   char **pzErrMsg,
@@ -51,13 +40,6 @@ __declspec(dllexport) int __cdecl sqlite3_stringmetrics_init(
 ){
   int rc = SQLITE_OK;
   SQLITE_EXTENSION_INIT2(pApi);
-  /* Insert here calls to
-  **     sqlite3_create_function_v2(),
-  **     sqlite3_create_collation_v2(),
-  **     sqlite3_create_module_v2(), and/or
-  **     sqlite3_vfs_register()
-  ** to register the new features that your extension adds.
-  */
   sqlite3_create_function(db, "stringmetrics", -1, SQLITE_ANY, 0, stringmetricsFunc, 0, 0);
   return rc;
 }

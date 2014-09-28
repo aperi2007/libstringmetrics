@@ -108,7 +108,9 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 	const char messaggio[] = "usage: \n\t$ stringmetrics(\"<algoritm>\",\"<kind of output>\",\"<string1>\",\"<string2>\",\"<tokenlist>\")\n" \
 							"\nWhere <kind of output> is one of (\"similarity\", \"metric\", \"phrase\")\n" \
 							"\nWhere <tokenlist> is the list of char used as token. It is not used by all the algoritms. The algorithms that use it are postfixed with \"custom\". If it is omitted the list used is \n\t\t\"carriage return\" \n\t\t\"newline (line feed)\" \n\t\t\"horizontal tab\" \n\t\t\"null character\" \n\t\t\"no-break space\" \n\t\t\"space\"" \
-							"\nWhere <algoritm> is one of:\n";
+							"example:\nselect stringmetrics(\"block_distance\",\"phrase\",\"via giuseppe-garibaldi\",\"via giuseppe garibaldi\",NULL);" \
+							"\nvs\nselect stringmetrics(\"block_distance_custom\",\"phrase\",\"via giuseppe-garibaldi\",\"via giuseppe garibaldi\",\"-\");" \
+							"\n\nWhere <algoritm> is one of:\n";
     if ( (argc != 5) || (sqlite3_value_type( argv[0] ) == SQLITE_NULL) || (sqlite3_value_type( argv[1] ) == SQLITE_NULL) || (sqlite3_value_type( argv[2] ) == SQLITE_NULL) || (sqlite3_value_type( argv[3] ) == SQLITE_NULL) ) {
 			mex = malloc(strlen(messaggio)+1);
 			strcpy(mex,messaggio);
@@ -131,7 +133,12 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 		char *par1 = strdup(sqlite3_value_text(argv[2]));
 		char *par2 = strdup(sqlite3_value_text(argv[3]));
 		char *kindofoutput = strdup(sqlite3_value_text(argv[1]));
-
+		char *par4 = NULL, *tokenlist = NULL;
+		if(sqlite3_value_type( argv[4] ) != SQLITE_NULL) {
+			par4 = strdup(sqlite3_value_text(argv[4]));
+			tokenlist = malloc(strlen(WHITESPACE_DELIMITERS) + strlen(par4) + 1);
+			sprintf(tokenlist,"%s%s",WHITESPACE_DELIMITERS,par4);
+		}
         switch (which_type(par0)) {
             case 0:
                 sm_name = "Block Distance";
@@ -139,9 +146,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 similarity = block_distance_similarity(par1, par2 );
                 break;
             case 1:
-                sm_name = "Block Distance customized";
-                sprintf(metrics, "%d", block_distance(par1,par2));
-                similarity = block_distance_similarity(par1, par2 );
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Block Distance customized";
+					sprintf(metrics, "%d", block_distance_custom(par1,par2,&tokenizer));
+	                similarity = block_distance_similarity_custom(par1, par2, &tokenizer );
+				}
                 break;
             case 2:
                 sm_name = "Cosine Similarity";
@@ -149,9 +163,16 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 sprintf(metrics, "%f", similarity);
                 break;
             case 3:
-                sm_name = "Cosine Similarity customized";
-                similarity = cosine_similarity(par1, par2);
-                sprintf(metrics, "%f", similarity);
+                {
+					std_tokenizer_t tokenizer = {
+						.delimiters = tokenlist,
+						.tok_utarr_func = &tokenize_to_utarray,
+						.tok_uq_hash_func = &uq_tokenize_to_hash
+					};
+	                sm_name = "Cosine Similarity customized";
+	                similarity = cosine_similarity_custom(par1, par2, &tokenizer );
+					sprintf(metrics, "%f", similarity);
+				}
                 break;
             case 4:
                 sm_name = "Dice Similarity";
