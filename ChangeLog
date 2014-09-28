@@ -1,3 +1,7 @@
 2014-09-22
-tokenizer.h: enhance the list of WHITESPACE_DELIMITERS
+tokenizer.h: enhance the list of WHITESPACE_DELIMITERS.
 
+2014-09-28
+tokenizer.h: restore the original WHITESPACE_DELIMITERS.
+remove duplicates algorithm from list.
+start to add customizable function to help define new delimiters.

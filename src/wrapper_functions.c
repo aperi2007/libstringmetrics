@@ -1,3 +1,57 @@
+/*
+ * * Copyright (C) 2014 Andrea Peri et al. All rights reserved.
+ *
+ * This file is part of libstringmetrics
+ *
+ * libstringmetrics is a SQLite Extension for the Library libsimmetrics. A C port
+ * of the Java project called Simmetrics,
+ *
+ * The C libsimmetrics can be found here: https://github.com/jokillsya/libsimmetrics
+ * The Java code can be found here: https://github.com/Simmetrics/simmetrics
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * wrapper_functions.c
+ *
+ *  Created on: 15 Sept 2014
+ *      Author: Andrea Peri <aperi2007@gmail.com>
+ */
+
+/*
+	the algorithm with the option to custom tokenizer are:
+		jaccard
+		euclidean
+		dice_similarity
+		cosine
+		block_distance
+		qgrams_distance
+		overlap_coefficient
+		monge_elkan
+		matching_coefficient
+
+	the algorithm that don't use the tokenizer are:
+		jaro
+		double_metaphone
+		cost
+		soundex
+		smith_waterman_gotoh
+		smith_waterman
+		needleman_wunch
+		metaphone
+		levenshtein
+		jaro_winkler
+*/
 
 #include <sqlite3.h>
 #include <string.h>
@@ -6,43 +60,35 @@
 #include <stddef.h>
 #include "simmetrics.h"
 
-	const int SIMMETC = 35;
+	const int SIMMETC = 27;
 
-	const char *SIMMETS[35] = {	"block",
-								"block_distance",
-								"cos",
+	const char *SIMMETS[27] = {	"block_distance",
+								"block_distance_custom",
 								"cosine",
+								"cosine_custom",
 								"dice",
-								"eucli",
+								"dice_custom",
 								"euclidean_distance",
-								"jac",
+								"euclidean_custom",
 								"jaccard",
-								"jar",
+								"jaccard_custom",
 								"jaro",
-								"wink",
 								"jaro_winkler",
-								"leven",
 								"levenshtein",
-								"match",
 								"matching_coefficient",
-								"monge",
+								"matching_coefficient_custom",
 								"monge_elkan",
-								"need",
+								"monge_elkan_custom",
 								"needleman_wunch",
-								"ol",
 								"overlap_coefficient",
-								"qg",
+								"overlap_coefficient_custom",
 								"qgrams_distance",
-								"smith",
+								"qgrams_custom",
 								"smith_waterman",
-								"gotoh",
 								"smith_waterman_gotoh",
-								"snd",
-								"soundex",
-        						"meta",
-        						"metaphone",
-        						"dmeta",
-        						"double_metaphone"
+								"soundex_phonetics",
+        						"metaphone_phonetics",
+       							"double_metaphone_phonetics"
         						};
 
 	int which_type(char *simtype)
@@ -58,17 +104,18 @@
 void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
 	int result;
-	char *sm_name=NULL, *mex=NULL, str[80], metrics[250];
-	const char messaggio[] = "usage: \n\t$ stringmetrics(\"<algoritm>\",\"<kind of output>\",\"<string1>\",\"<string2>\")\n" \
+	char *sm_name=NULL, *mex=NULL, str[80], metrics[250], tokenlist=NULL;
+	const char messaggio[] = "usage: \n\t$ stringmetrics(\"<algoritm>\",\"<kind of output>\",\"<string1>\",\"<string2>\",\"<tokenlist>\")\n" \
 							"\nWhere <kind of output> is one of (\"similarity\", \"metric\", \"phrase\")\n" \
+							"\nWhere <tokenlist> is the list of char used as token. It is not used by all the algoritms. The algorithms that use it are postfixed with \"custom\". If it is omitted the list used is \n\t\t\"carriage return\" \n\t\t\"newline (line feed)\" \n\t\t\"horizontal tab\" \n\t\t\"null character\" \n\t\t\"no-break space\" \n\t\t\"space\"" \
 							"\nWhere <algoritm> is one of:\n";
-    if ( (argc != 4) || (sqlite3_value_type( argv[0] ) == SQLITE_NULL) || (sqlite3_value_type( argv[1] ) == SQLITE_NULL) || (sqlite3_value_type( argv[2] ) == SQLITE_NULL) || (sqlite3_value_type( argv[3] ) == SQLITE_NULL) ) {
+    if ( (argc != 5) || (sqlite3_value_type( argv[0] ) == SQLITE_NULL) || (sqlite3_value_type( argv[1] ) == SQLITE_NULL) || (sqlite3_value_type( argv[2] ) == SQLITE_NULL) || (sqlite3_value_type( argv[3] ) == SQLITE_NULL) ) {
 			mex = malloc(strlen(messaggio)+1);
 			strcpy(mex,messaggio);
 	        int i;
 	        for (i=0; i < SIMMETC; i++) {
 	            if (i > 0) {
-	                sprintf(str,"   %s", SIMMETS[i]);
+	                sprintf(str,"   \t\t%s\n", SIMMETS[i]);
 	            	mex = realloc(mex,strlen(mex)+strlen(str)+1);
 	            	strcat(mex,str);
 				}
@@ -87,14 +134,22 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 
         switch (which_type(par0)) {
             case 0:
-            case 1:
                 sm_name = "Block Distance";
                 sprintf(metrics, "%d", block_distance(par1,par2));
                 similarity = block_distance_similarity(par1, par2 );
                 break;
+            case 1:
+                sm_name = "Block Distance customized";
+                sprintf(metrics, "%d", block_distance(par1,par2));
+                similarity = block_distance_similarity(par1, par2 );
+                break;
             case 2:
-            case 3:
                 sm_name = "Cosine Similarity";
+                similarity = cosine_similarity(par1, par2);
+                sprintf(metrics, "%f", similarity);
+                break;
+            case 3:
+                sm_name = "Cosine Similarity customized";
                 similarity = cosine_similarity(par1, par2);
                 sprintf(metrics, "%f", similarity);
                 break;
@@ -104,79 +159,101 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 sprintf(metrics, "%f", similarity);
                 break;
             case 5:
+                sm_name = "Dice Similarity customized";
+                similarity = dice_similarity(par1, par2);
+                sprintf(metrics, "%f", similarity);
+                break;
             case 6:
                 sm_name = "Euclidean Distance";
                 sprintf(metrics, "%3.2f", euclidean_distance(par1, par2));
                 similarity = euclidean_distance_similarity(par1, par2);
                 break;
             case 7:
+                sm_name = "Euclidean Distance customized";
+                sprintf(metrics, "%3.2f", euclidean_distance(par1, par2));
+                similarity = euclidean_distance_similarity(par1, par2);
+                break;
             case 8:
                 sm_name = "Jaccard Similarity";
                 similarity = jaccard_similarity(par1, par2);
                 sprintf(metrics, "%f", similarity);
                 break;
             case 9:
+                sm_name = "Jaccard Similarity customized";
+                similarity = jaccard_similarity(par1, par2);
+                sprintf(metrics, "%f", similarity);
+                break;
             case 10:
                 sm_name = "Jaro Similarity";
                 similarity = jaro_similarity(par1, par2);
                 sprintf(metrics, "%f", similarity);
                 break;
             case 11:
-            case 12:
                 sm_name = "Jaro Winkler Similarity";
                 similarity = jaro_winkler_similarity(par1, par2);
                 sprintf(metrics, "%f", similarity);
                 break;
-            case 13:
-            case 14:
+            case 12:
                 sm_name = "Levenshtein Distance";
                 sprintf(metrics, "%d", levenshtein(par1, par2));
                 similarity = levenshtein_similarity(par1, par2);
                 break;
-            case 15:
-            case 16:
+            case 13:
                 sm_name = "Matching Coefficient SimMetrics";
                 sprintf(metrics, "%3.2f", matching_coefficient(par1, par2));
                 similarity = matching_coefficient_similarity(par1, par2);
                 break;
-            case 17:
-            case 18:
+            case 14:
+                sm_name = "Matching Coefficient SimMetrics customized";
+                sprintf(metrics, "%3.2f", matching_coefficient(par1, par2));
+                similarity = matching_coefficient_similarity(par1, par2);
+                break;
+            case 15:
                 sm_name = "Monge Elkan Similarity";
                 similarity = monge_elkan_similarity(par1, par2);
                 sprintf(metrics, "%f", similarity);
                 break;
-            case 19:
-            case 20:
+            case 16:
+                sm_name = "Monge Elkan Similarity customized";
+                similarity = monge_elkan_similarity(par1, par2);
+                sprintf(metrics, "%f", similarity);
+                break;
+            case 17:
                 sm_name = "Needleman Wunch SimMetrics";
                 sprintf(metrics, "%3.2f", needleman_wunch(par1, par2));
                 similarity = needleman_wunch_similarity(par1, par2);
                 break;
-            case 21:
-            case 22:
+            case 18:
                 sm_name = "Overlap Coefficient Similarity";
                 similarity = overlap_coefficient_similarity(par1, par2);
                 sprintf(metrics, "%f", similarity);
                 break;
-            case 23:
-            case 24:
+            case 19:
+                sm_name = "Overlap Coefficient Similarity customized";
+                similarity = overlap_coefficient_similarity(par1, par2);
+                sprintf(metrics, "%f", similarity);
+                break;
+            case 20:
                 sm_name = "QGrams Distance";
                 sprintf(metrics, "%d", qgrams_distance(par1, par2));
                 similarity = qgrams_distance_similarity(par1, par2);
                 break;
-            case 25:
-            case 26:
+            case 21:
+                sm_name = "QGrams Distance customized";
+                sprintf(metrics, "%d", qgrams_distance(par1, par2));
+                similarity = qgrams_distance_similarity(par1, par2);
+                break;
+            case 22:
                 sm_name = "Smith Waterman SimMetrics";
                 sprintf(metrics, "%3.2f", smith_waterman(par1, par2));
                 similarity = smith_waterman_similarity(par1, par2);
                 break;
-            case 27:
-            case 28:
+            case 23:
                 sm_name = "Smith Waterman Gotoh SimMetrics";
                 sprintf(metrics, "%3.2f", smith_waterman_gotoh(par1, par2));
                 similarity = smith_waterman_gotoh_similarity(par1, par2);
                 break;
-            case 29:
-            case 30:
+            case 24:
                 sm_name = "Soundex Phonetics";
                 char *s1 = soundex(par1);
                 char *s2 = soundex(par2);
@@ -185,8 +262,7 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 free(s2);
                 similarity = soundex_similarity(par1, par2);
                 break;
-            case 31:
-            case 32:
+            case 25:
                 sm_name = "Metaphone Phonetics";
                 char *m1 = metaphone(par1);
                 char *m2 = metaphone(par2);
@@ -195,8 +271,7 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 free(m2);
                 similarity = metaphone_similarity(par1, par2);
                 break;
-            case 33:
-            case 34:
+            case 26:
                 sm_name = "Double Metaphone Phonetics";
                 char *dm1 = double_metaphone(par1);
                 char *dm2 = double_metaphone(par2);
