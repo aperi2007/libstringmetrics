@@ -53,12 +53,14 @@
 		jaro_winkler
 */
 
-#include <sqlite3.h>
+#include "sqlite3ext.h"
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <stddef.h>
 #include "simmetrics.h"
+
+SQLITE_EXTENSION_INIT3
 
 	const int SIMMETC = 27;
 
@@ -101,7 +103,7 @@
 	    return (-1);
 	}
 
-void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
+int stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
 	int result;
 	char *sm_name=NULL, *mex=NULL, str[80], metrics[250], tokenlist=NULL;
@@ -347,12 +349,12 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
                 break;
             default:
                sprintf(metrics,"Unknown SimMetric %s, not found.\n", par0);
-               return (1);
+               return (SQLITE_ERROR);
 		}
 		if(kindofoutput!=NULL) {
-			if(strcmp(tolower(kindofoutput),"similarity")==0) {
+			if(stricmp(kindofoutput,"similarity")==0) {
 				sqlite3_result_double(context, similarity);
-			} else if(strcmp(tolower(kindofoutput),"metric")==0) {
+			} else if(stricmp(kindofoutput,"metric")==0) {
 				sqlite3_result_text(context, metrics, strlen(metrics)+1, NULL);
 			} else {
 				mex = malloc(strlen(sm_name) + 200 + strlen(metrics)+1);
@@ -366,5 +368,5 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 		}
     }
 
-	return;
+	return (SQLITE_OK);
 }

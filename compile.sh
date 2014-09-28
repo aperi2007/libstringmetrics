@@ -1,12 +1,12 @@
 
-gcc 	-std=c99 \
-	-w \
-	-g \
-	-O0 \
+gcc 	-s \
+	-O3 \
+	-std=gnu99 \
+	-mdll \
+	-mthreads \
+	-Bl,--static \
+	-static-libgcc \
     	-I src \
-	-shared \
-    	-static-libgcc \
-	-static-libstdc++ \
 	-I src/libsimmetrics/include \
 	-I src/libsqlite/include \
 	-o libstringmetrics.dll \
@@ -33,7 +33,8 @@ gcc 	-std=c99 \
 	src/libsimmetrics/simmetrics/smith_waterman_gotoh.c \
 	src/libsimmetrics/simmetrics/soundex.c \
 	src/libsimmetrics/simmetrics/tokenizer.c \
-	src/libsimmetrics/simmetrics/util.c \
-	src/libsqlite/sqlite/sqlite3.c
+	src/libsimmetrics/simmetrics/util.c
+
+#	src/libsqlite/sqlite/sqlite3.c
 
 	
