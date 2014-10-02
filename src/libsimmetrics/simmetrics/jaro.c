@@ -89,11 +89,19 @@ float jaro_similarity(const char *str1, const char *str2) {
 
 	if ((c1_len == 0) || (c2_len == 0)) {
 
+		// need to free the "\0"
+		free(com1);
+		free(com2);
+
 		return (0.0);
 
 	}
 
 	if (c1_len != c2_len) {
+
+		// need to free
+		free(com1);
+		free(com2);
 
 		return (0.0);
 

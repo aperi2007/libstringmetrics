@@ -40,7 +40,7 @@ __declspec(dllexport) int __cdecl sqlite3_stringmetrics_init(
 ){
   int rc = SQLITE_OK;
   SQLITE_EXTENSION_INIT2(pApi);
-  sqlite3_create_function(db, "stringmetrics", -1, SQLITE_ANY, 0, stringmetricsFunc, 0, 0);
+  sqlite3_create_function(db, "stringmetrics", -1, SQLITE_UTF8, 0, stringmetricsFunc, 0, 0);
   return rc;
 }
 

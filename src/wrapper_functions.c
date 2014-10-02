@@ -97,8 +97,9 @@ SQLITE_EXTENSION_INIT3
 	{
 	    int i;
 	    for (i=0; i < SIMMETC; i++) {
-	        if (strcmp(SIMMETS[i], simtype) == 0)
+	        if (strcmp(SIMMETS[i], simtype) == 0) {
  	           return (i);
+			}
 	    }
 	    return (-1);
 	}
@@ -106,40 +107,48 @@ SQLITE_EXTENSION_INIT3
 void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
 	int result;
-	char *sm_name=NULL, *mex=NULL, str[80], metrics[250], tokenlist=NULL;
+	char *sm_name=NULL, *mex=NULL, str[80], metrics[250], *tokenlist=NULL;
 	const char messaggio[] = "usage: \n\t$ stringmetrics(\"<algoritm>\",\"<kind of output>\",\"<string1>\",\"<string2>\",\"<tokenlist>\")\n" \
 							"\nWhere <kind of output> is one of (\"similarity\", \"metric\", \"phrase\")\n" \
 							"\nWhere <tokenlist> is the list of char used as token. It is not used by all the algoritms. The algorithms that use it are postfixed with \"custom\". If it is omitted the list used is \n\t\t\"carriage return\" \n\t\t\"newline (line feed)\" \n\t\t\"horizontal tab\" \n\t\t\"null character\" \n\t\t\"no-break space\" \n\t\t\"space\"" \
 							"example:\nselect stringmetrics(\"block_distance\",\"phrase\",\"via giuseppe-garibaldi\",\"via giuseppe garibaldi\",NULL);" \
 							"\nvs\nselect stringmetrics(\"block_distance_custom\",\"phrase\",\"via giuseppe-garibaldi\",\"via giuseppe garibaldi\",\"-\");" \
 							"\n\nWhere <algoritm> is one of:\n";
-    if ( (argc != 5) || (sqlite3_value_type( argv[0] ) == SQLITE_NULL) || (sqlite3_value_type( argv[1] ) == SQLITE_NULL) || (sqlite3_value_type( argv[2] ) == SQLITE_NULL) || (sqlite3_value_type( argv[3] ) == SQLITE_NULL) ) {
-			mex = malloc(strlen(messaggio)+1);
-			strcpy(mex,messaggio);
+
+    if ( (argc != 5) || (sqlite3_value_type( argv[0] ) == SQLITE_NULL) || (sqlite3_value_type( argv[1] ) == SQLITE_NULL) ) {
+			mex = sqlite3_mprintf("%s",messaggio);
 	        int i;
 	        for (i=0; i < SIMMETC; i++) {
 	            if (i > 0) {
-	                sprintf(str,"   \t\t%s\n", SIMMETS[i]);
-	            	mex = realloc(mex,strlen(mex)+strlen(str)+1);
-	            	strcat(mex,str);
+					sprintf(str," \t\t%s\n", SIMMETS[i]);
+	            	//mex = sqlite3_realloc(mex,strlen(mex)+strlen(str)+1);
+	            	mex = sqlite3_mprintf("%s%s",mex,str);
 				}
 	        }
-            sprintf(str,"\n");
-          	mex = realloc(mex,strlen(mex)+strlen(str)+1);
-           	strcat(mex,str);
-			sqlite3_result_text(context, mex, strlen(mex)+1, free);
-
+          	//mex = sqlite3_realloc(mex,strlen(mex)+strlen("\n")+1);
+			mex = sqlite3_mprintf("%s%\n",mex);
+			sqlite3_result_text(context, mex, strlen(mex)+1, sqlite3_free);
 	} else {
         float similarity = 0;
-		char *par0 = strdup(sqlite3_value_text(argv[0]));
-		char *par1 = strdup(sqlite3_value_text(argv[2]));
-		char *par2 = strdup(sqlite3_value_text(argv[3]));
-		char *kindofoutput = strdup(sqlite3_value_text(argv[1]));
+		char *par0 = (char *)sqlite3_value_text(argv[0]);
+		char *par1 = NULL;
+		char *par2 = NULL;
+		if( sqlite3_value_type( argv[2] ) == SQLITE_NULL) {
+			par1 = sqlite3_mprintf("");
+		} else {
+			par1 = (char *)sqlite3_value_text(argv[2]);
+		}
+		if( sqlite3_value_type( argv[3] ) == SQLITE_NULL) {
+			par2 = sqlite3_mprintf("");
+		} else {
+			par2 = (char *)sqlite3_value_text(argv[3]);
+		}
+		char *kindofoutput = (char *)sqlite3_value_text(argv[1]);
 		char *par4 = NULL, *tokenlist = NULL;
 		if(sqlite3_value_type( argv[4] ) != SQLITE_NULL) {
-			par4 = strdup(sqlite3_value_text(argv[4]));
-			tokenlist = malloc(strlen(WHITESPACE_DELIMITERS) + strlen(par4) + 1);
-			sprintf(tokenlist,"%s%s",WHITESPACE_DELIMITERS,par4);
+			par4 =  (char *)sqlite3_value_text(argv[4]);
+			tokenlist = sqlite3_mprintf("%s%s",WHITESPACE_DELIMITERS,par4);
+			//sqlite3_free(par4);
 		}
         switch (which_type(par0)) {
             case 0:
@@ -356,17 +365,22 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 			if(stricmp(kindofoutput,"similarity")==0) {
 				sqlite3_result_double(context, similarity);
 			} else if(stricmp(kindofoutput,"metric")==0) {
-				sqlite3_result_text(context, metrics, strlen(metrics)+1, SQLITE_TRANSIENT);
+				sqlite3_result_text(context, metrics, strlen(metrics)+1, SQLITE_STATIC);
 			} else {
-				mex = malloc(strlen(sm_name) + 200 + strlen(metrics)+1);
-				sprintf(mex,"%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
-				sqlite3_result_text(context, mex, strlen(mex)+1, free);
+				mex = sqlite3_mprintf("%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
+				sqlite3_result_text(context, mex, strlen(mex)+1, sqlite3_free);
 			}
 		} else {
-			mex = malloc(strlen(sm_name) + 200 + strlen(metrics)+1);
-			sprintf(mex,"%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
-			sqlite3_result_text(context, mex, strlen(mex)+1, free);
+			mex = sqlite3_mprintf("%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
+			sqlite3_result_text(context, mex, strlen(mex)+1, sqlite3_free);
 		}
+			//sqlite3_free(par0);
+			//sqlite3_free(par1);
+			//sqlite3_free(par2);
+			//sqlite3_free(kindofoutput);
+			if(tokenlist != NULL) {
+				sqlite3_free(tokenlist);
+			}
     }
 
 	return;
