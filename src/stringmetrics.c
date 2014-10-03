@@ -1,13 +1,13 @@
 /*
- * * Copyright (C) 2014 Andrea Peri. All rights reserved.
+ * * Copyright (C) 2014 Andrea Peri et al. All rights reserved.
  *
  * This file is part of libstringmetrics
  *
- * libstringmetrics is a SQLite Extension for the Library libsimmetrics. A C port
- * of the Java project called Simmetrics,
+ * libstringmetrics is a SQLite Extension for the Library libsimmetrics.
+ * The Library libsimmetrics is a C port of the Java project called Simmetrics.
  *
- * The C libsimmetrics can be found here: https://github.com/jokillsya/libsimmetrics
- * The Java code can be found here: https://github.com/Simmetrics/simmetrics
+ * The original C libsimmetrics can be found here: https://github.com/jokillsya/libsimmetrics
+ * The original Java code can be found here: https://github.com/Simmetrics/simmetrics
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

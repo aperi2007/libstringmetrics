@@ -67,7 +67,7 @@ static char *get_common_chars(const char *str1, const char *str2,
 	}
 
 	ret[k++] = '\0';
-	ret_str = malloc(sizeof(ret) * strlen(ret));
+	ret_str = malloc((sizeof(ret) * strlen(ret)) + 1);
 	strcpy(ret_str, ret);
 
 	return (ret_str);

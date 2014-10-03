@@ -9,3 +9,9 @@ start to add customizable function to help define new delimiters.
 2014-09-28
 some bug removed and optimize compiling, contribute from Keith Medcalf (http://sqlite.org:8080/cgi-bin/mailman/private/sqlite-users/2014-September/055721.html)
 
+2014-10-02 
+some bug resolved
+
+2014-10-03
+some bug removed thx to the contribute of Alessandro Furieri (http://www.gaia-gis.it/gaia-sins)
+

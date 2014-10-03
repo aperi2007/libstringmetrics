@@ -3,11 +3,11 @@
  *
  * This file is part of libstringmetrics
  *
- * libstringmetrics is a SQLite Extension for the Library libsimmetrics. A C port
- * of the Java project called Simmetrics,
+ * libstringmetrics is a SQLite Extension for the Library libsimmetrics.
+ * The Library libsimmetrics is a C port of the Java project called Simmetrics.
  *
- * The C libsimmetrics can be found here: https://github.com/jokillsya/libsimmetrics
- * The Java code can be found here: https://github.com/Simmetrics/simmetrics
+ * The original C libsimmetrics can be found here: https://github.com/jokillsya/libsimmetrics
+ * The original Java code can be found here: https://github.com/Simmetrics/simmetrics
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -127,22 +127,28 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 	        }
           	//mex = sqlite3_realloc(mex,strlen(mex)+strlen("\n")+1);
 			mex = sqlite3_mprintf("%s%\n",mex);
-			sqlite3_result_text(context, mex, strlen(mex)+1, sqlite3_free);
+
+			// Pay attention: in the sqlite3_result must be used exactly the strlne(mex) , not strlne(mex)+1. This mean that must be ignored the "\0".
+			sqlite3_result_text(context, mex, strlen(mex), sqlite3_free);
+
 	} else {
         float similarity = 0;
 		char *par0 = (char *)sqlite3_value_text(argv[0]);
-		char *par1 = NULL;
-		char *par2 = NULL;
+
+		const char *par1 = NULL;
 		if( sqlite3_value_type( argv[2] ) == SQLITE_NULL) {
-			par1 = sqlite3_mprintf("");
+			par1 = "";
 		} else {
-			par1 = (char *)sqlite3_value_text(argv[2]);
+			par1 = (const char *)sqlite3_value_text(argv[2]);
 		}
+
+		const char *par2 = NULL;
 		if( sqlite3_value_type( argv[3] ) == SQLITE_NULL) {
-			par2 = sqlite3_mprintf("");
+			par2 = "";
 		} else {
-			par2 = (char *)sqlite3_value_text(argv[3]);
+			par2 = (const char *)sqlite3_value_text(argv[3]);
 		}
+
 		char *kindofoutput = (char *)sqlite3_value_text(argv[1]);
 		char *par4 = NULL, *tokenlist = NULL;
 		if(sqlite3_value_type( argv[4] ) != SQLITE_NULL) {
