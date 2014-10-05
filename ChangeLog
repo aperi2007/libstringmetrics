@@ -15,3 +15,5 @@ some bug resolved
 2014-10-03
 some bug removed thx to the contribute of Alessandro Furieri (http://www.gaia-gis.it/gaia-sins)
 
+2014-10-04
+The similarity should always return a percent result (0.75 -> 75 (%))
