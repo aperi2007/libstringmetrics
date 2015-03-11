@@ -449,7 +449,7 @@ void stringmetricsFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
 		if(ikindofoutput==CONST_SIMILARITY) {
 			sqlite3_result_double(context, similarity*100);
 		} else if(ikindofoutput==CONST_METRIC) {
-			sqlite3_result_text(context, metrics, strlen(metrics)+1, SQLITE_STATIC);
+			sqlite3_result_text(context, metrics, strlen(metrics)+1, SQLITE_TRANSIENT);
 		} else {
 			mex = sqlite3_mprintf("%s between \"%s\" & \"%s\" is \"%s\" and yields a %3.0f%% similarity",sm_name,par1,par2,metrics,similarity*100);
 			sqlite3_result_text(context, mex, strlen(mex)+1, sqlite3_free);
