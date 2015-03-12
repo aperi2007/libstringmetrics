@@ -90,7 +90,8 @@ dl_token_t *qgram_tokenize_to_dllist(const char *str, const qgram_t *qtype) {
 
 	if(qtype->extended) {
 
-		tmp = calloc((init_len + qtype->qgram_len), sizeof(char));
+		//tmp = calloc((init_len + qtype->qgram_len), sizeof(char));
+		tmp = calloc((init_len + 2 * qtype->qgram_len), sizeof(char));
 
 		for(i = 0; i < (qtype->qgram_len - 1); i++)
 			strcat(tmp, QGRAM_SP);
@@ -145,7 +146,8 @@ hash_token_t *qgram_uq_tokenize_to_hash(const char *str, const qgram_t *qtype) {
 
 	if(qtype->extended) {
 
-		tmp = calloc((init_len + qtype->qgram_len), sizeof(char));
+		//tmp = calloc((init_len + qtype->qgram_len), sizeof(char));
+		tmp = calloc((init_len + 2 * qtype->qgram_len), sizeof(char));
 
 		for(i = 0; i < (qtype->qgram_len - 1); i++)
 			strcat(tmp, QGRAM_SP);
@@ -213,7 +215,8 @@ UT_array *qgram_tokenize_to_utarray(const char *str, const qgram_t *qtype) {
 
 	if(qtype->extended) {
 
-		tmp = calloc((init_len + qtype->qgram_len), sizeof(char));
+		//tmp = calloc((init_len + qtype->qgram_len), sizeof(char));
+		tmp = calloc((init_len + 2 * qtype->qgram_len), sizeof(char));
 
 		for(i = 0; i < (qtype->qgram_len - 1); i++)
 			strcat(tmp, QGRAM_SP);
